@@ -9,12 +9,6 @@ OR
   - produce in the 'results' sub-directory (which you may have to create)
     - an html xref of all selected repos to show which version of which library is used in which project
 
-# dependencies
-
-```commandline
-
-```
-
 # to run
 
 ## option 1 - GitHub
