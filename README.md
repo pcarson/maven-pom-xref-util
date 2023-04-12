@@ -1,4 +1,6 @@
-# check-maven-pom-xref-all.py
+# Maven cross-reference utils
+## check-maven-pom-xref-file-system.py
+## check-maven-pom-xref-github.py
 
 A simple python utility (Disclaimer: I'm a Java with maven developer not a Python developer) to read 
 * GitHub repos for all MAVEN projects with a given prefix 
