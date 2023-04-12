@@ -9,10 +9,27 @@ OR
   - produce in the 'results' sub-directory (which you may have to create)
     - an html xref of all selected repos to show which version of which library is used in which project
 
+# dependencies
+
+```commandline
+
+```
+
 # to run
 
 ## option 1 - GitHub
-### Requirements
+### dependencies
+```commandline
+import argparse
+import base64
+import datetime
+import json
+import os
+import tempfile
+from io import StringIO
+import requests
+import xmltodict
+```
 ### GitHub security
 The script expects to be supplied with a git username and a git PAT 'personal access token' which has access to all relevant repositories to be queried.
 See Github https://github.com/settings/tokens
@@ -28,6 +45,14 @@ python3 check-maven-pom-xref-github.py --help
 ```
 
 ## option 2 - File System
+### dependencies
+```commandline
+import argparse
+import datetime
+import os
+from io import StringIO
+import xmltodict
+```
 ### Requirements
 The script expects to be supplied with a local directory name containing all relevant repositories to be queried.
 
