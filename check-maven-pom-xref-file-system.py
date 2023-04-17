@@ -108,6 +108,8 @@ def process_repositories_for_branch():
         xml_doc = handle_xml_content(client_repo['url'])
         if xml_doc is not None:
             pom_parser.process_xml_content(FILE_SYSTEM_CONST, client_repo, xml_doc)
+        else:
+            client_repo.update({FILE_SYSTEM_CONST + '_pom_exists': False})
 
     library_details = pom_parser.get_library_details()
 

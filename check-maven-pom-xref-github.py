@@ -172,7 +172,9 @@ def process_repositories_for_branch(branch):
     for client_repo in repository_list:
         xml_doc = handle_xml_content(client_repo, branch)
         if xml_doc is not None:
-            pom_parser.process_xml_content('file-system', client_repo, xml_doc)
+            pom_parser.process_xml_content(branch, client_repo, xml_doc)
+        else:
+            client_repo.update({branch + '_pom_exists': False})
 
     library_details = pom_parser.get_library_details()
 
