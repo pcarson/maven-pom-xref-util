@@ -74,4 +74,4 @@ python3 check-maven-pom-xref-file-system.py --help
 ```
 
 ## Example HTML output
-![Image]{example-html-report.png}
+![Image](example-html-report.png)
