@@ -35,6 +35,7 @@ arg_repo_prefix = None
 git_branches = ['master', 'release']
 ignore_repos = []
 ignore_archived_projects = False
+ignore_private_projects = False
 #
 output_file_name = 'results/' + datetime.datetime.now().replace(microsecond=0).isoformat() + '-maven-xref-github.html'
 #
@@ -45,7 +46,8 @@ pom_parser = PomParser()
 
 
 def parse_command_line_arguments():
-    global git_username, git_token, arg_repo_prefix, git_branches, ignore_repos, ignore_archived_projects
+    global git_username, git_token, arg_repo_prefix, git_branches
+    global ignore_repos, ignore_archived_projects, ignore_private_projects
     # create parser
     parser = argparse.ArgumentParser()
     # add arguments to the parser
@@ -58,6 +60,8 @@ def parse_command_line_arguments():
                         help='comma separated list of repositories to be ignored, e.g. repo-one,repo-three')
     parser.add_argument('--git_ignore_archived', '-ia',
                         help='ignore archived projects Y|N')
+    parser.add_argument('--git_ignore_private', '-ip',
+                        help='ignore private projects Y|N')
 
     # parse the arguments
     args = parser.parse_args()
@@ -77,6 +81,8 @@ def parse_command_line_arguments():
         ignore_repos = args.git_repo_list_to_ignore.split(",")
     if args.git_ignore_archived is not None and args.git_ignore_archived == 'Y':
         ignore_archived_projects = True
+    if args.git_ignore_private is not None and args.git_ignore_private == 'Y':
+        ignore_private_projects = True
 
     if git_username is None or git_token is None:
         print('Missing parameters - run "python3 check-maven-pom-library-version-use.py -h" '
@@ -135,7 +141,10 @@ def process_repo_names(repos):
     global repository_list
     # process the repo names
     for repo in repos:
+        private = False
         archived = False
+        if 'private' in repo:
+            private = repo['private']
         if 'archived' in repo:
             archived = repo['archived']
         if we_do_process_this_repo(repo['name']):
@@ -146,10 +155,18 @@ def process_repo_names(repos):
             if 'owner' in repo:
                 owner_object = repo['owner']
                 owner = owner_object['login']
-            if ignore_archived_projects is True and archived is True:
-                print('Ignoring ' + repo['name'] + ' as it is archived')
+            if private_or_archived(archived, private):
+                print('Ignoring ' + repo['name'] + ' as it is archived or private')
             else:
                 repository_list.append({'name': repo['name'], 'owner': owner, 'url': repo['url']})
+
+
+def private_or_archived(archived, private):
+    if ignore_archived_projects is True and archived is True:
+        return True
+    if ignore_private_projects is True and private is True:
+        return True
+    return False
 
 
 def we_do_process_this_repo(repo_name):
