@@ -15,8 +15,11 @@ class PomParser:
     DEPENDENCY_MANAGEMENT_CONST = 'dependencyManagement'
     DEPENDENCIES_CONST = 'dependencies'
     DEPENDENCY_CONST = 'dependency'
+    PLUGINS_CONST = 'plugins'
+    PLUGIN_CONST = 'plugin'
     PROJECT_CONST = 'project'
     PARENT_CONST = 'parent'
+    BUILD_CONST = 'build'
 
     def __init__(self):
         PomParser.library_details = []
@@ -35,6 +38,12 @@ class PomParser:
                                              dependency_list,
                                              branch,
                                              xml_doc)
+            if PomParser.PLUGINS_CONST in xml_doc[PomParser.PROJECT_CONST][PomParser.BUILD_CONST]:
+                plugin_list = xml_doc[PomParser.PROJECT_CONST][PomParser.BUILD_CONST][PomParser.PLUGINS_CONST][PomParser.PLUGIN_CONST]
+                self.process_dependency_list_for(client_repo[PomParser.NAME_CONST],
+                                                 plugin_list,
+                                                 branch,
+                                                 xml_doc)
             # also check the 'parent' structure
             if PomParser.PARENT_CONST in xml_doc[PomParser.PROJECT_CONST]:
                 parent_list = xml_doc[PomParser.PROJECT_CONST][PomParser.PARENT_CONST]
