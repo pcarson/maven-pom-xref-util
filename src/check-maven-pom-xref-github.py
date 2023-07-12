@@ -1,6 +1,6 @@
 #
 # Read GitHub repos for projects ..
-# - cross reference all library versions used in all code ....
+# - cross reference all library versions used in all src ....
 #
 # see https://docs.github.com/en/rest/reference/repos#contents
 #

@@ -1,6 +1,6 @@
 #
 # Read a directory of maven projects and process the pom.xml files.
-# - cross reference all library versions used in all code ....
+# - cross reference all library versions used in all src ....
 #
 #
 import argparse

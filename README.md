@@ -33,11 +33,11 @@ See Github https://github.com/settings/tokens
 ### command line parameters
 e.g.:
 ```
-python3 check-maven-pom-xref-github.py -u=<git username> -t=<github PAT> -p=<repo prefix to select, empty for all> -b=<comma separated list of branches to include> -ia=<ignore archived projects Y|N> -ip=<ignore private projects Y|N>  -i=<comma-separated list of repositories to IGNORE - no spaces between the repo names, just a comma>
+python3 src/check-maven-pom-xref-github.py -u=<git username> -t=<github PAT> -p=<repo prefix to select, empty for all> -b=<comma separated list of branches to include> -ia=<ignore archived projects Y|N> -ip=<ignore private projects Y|N>  -i=<comma-separated list of repositories to IGNORE - no spaces between the repo names, just a comma>
 ```
 for more parameter information:
 ```
-python3 check-maven-pom-xref-github.py --help
+python3 src/check-maven-pom-xref-github.py --help
 ```
 
 ## option 2 - File System
@@ -66,11 +66,11 @@ source-directory
 ### command line parameters
 e.g.:
 ```
-python3 check-maven-pom-xref-file-system.py -d=/home/maven-projects/source-directory -p=<repo prefix to select, empty for all> -i=<comma-separated list of repositories to IGNORE - no spaces between the repo names, just a comma>
+python3 src/check-maven-pom-xref-file-system.py -d=/home/maven-projects/source-directory -p=<repo prefix to select, empty for all> -i=<comma-separated list of repositories to IGNORE - no spaces between the repo names, just a comma>
 ```
 for more parameter information:
 ```
-python3 check-maven-pom-xref-file-system.py --help
+python3 src/check-maven-pom-xref-file-system.py --help
 ```
 
 ## Example HTML output
