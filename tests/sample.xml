@@ -78,7 +78,7 @@
       <artifactId>javax.annotation-api</artifactId>           
       <version>${javax-annotation.version}</version>       
     </dependency>       
-    <!-- test -->       
+    <!-- tests -->
     <dependency>           
       <groupId>org.springframework.boot</groupId>           
       <artifactId>spring-boot-starter-test</artifactId>           
@@ -108,12 +108,12 @@
         <version>2.22.1</version>               
         <configuration>                   
           <excludes>                       
-            <!--                       exclude integration tests from unit test phase                       so we don\'t have to load H2                        -->                       
+            <!--                       exclude integration tests from unit tests phase                       so we don\'t have to load H2                        -->
             <exclude>**/*IntegrationTest.java</exclude>                   
           </excludes>               
         </configuration>           
       </plugin>           
-      <!--           run integration tests via the failsafe plugin.           -->           
+      <!--           run integration tests via the failsafe plugin.           -->
       <plugin>               
         <groupId>org.apache.maven.plugins</groupId>               
         <artifactId>maven-failsafe-plugin</artifactId>               

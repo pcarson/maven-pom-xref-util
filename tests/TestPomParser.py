@@ -3,7 +3,7 @@ import unittest
 
 import xmltodict
 
-from src.PomParser import PomParser
+from pom_xref_util.modules.pom_parser.pomparser import PomParser
 
 #
 # see https://docs.python.org/3/library/unittest.html
@@ -36,7 +36,7 @@ class TestPomParser(unittest.TestCase):
         self.assertEqual(10, len(PomParser.library_details))
 
         # in this case, we expect the lombok version to match that in sample.xml
-        self.assertEqual('1.18.26', self.parser.return_highest('', 'lombok'))
+        self.assertEqual('1.18.26', self.parser.return_highest('', 'lombok'), 'Expected result 1.18.26 :tick')
 
     @unittest.skip("demonstrating skipping")
     def test_nothing(self):

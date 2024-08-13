@@ -2,24 +2,12 @@
 # Analyse and collate POM library details
 #
 
+from pom_xref_util.utils.constants import Constants
+
 
 class PomParser:
     # class variable as only 1 possible user
     library_details = []
-
-    # Constants
-    NAME_CONST = 'name'
-    VERSION_CONST = 'version'
-    CLIENT_CONST = 'client'
-    HIGHEST_CONST = 'highest'
-    DEPENDENCY_MANAGEMENT_CONST = 'dependencyManagement'
-    DEPENDENCIES_CONST = 'dependencies'
-    DEPENDENCY_CONST = 'dependency'
-    PLUGINS_CONST = 'plugins'
-    PLUGIN_CONST = 'plugin'
-    PROJECT_CONST = 'project'
-    PARENT_CONST = 'parent'
-    BUILD_CONST = 'build'
 
     def __init__(self):
         PomParser.library_details = []
@@ -33,37 +21,41 @@ class PomParser:
             # look for each of the lib libraries being used here ....
             # if xml_doc['project']['artifactId']} ...
             client_repo.update({branch + '_pom_exists': True})
-            dependency_list = xml_doc[PomParser.PROJECT_CONST][PomParser.DEPENDENCIES_CONST][PomParser.DEPENDENCY_CONST]
-            self.process_dependency_list_for(client_repo[PomParser.NAME_CONST],
+            dependency_list = xml_doc[Constants.PROJECT_CONST][Constants.DEPENDENCIES_CONST][Constants.DEPENDENCY_CONST]
+            self.process_dependency_list_for(client_repo[Constants.NAME_CONST],
                                              dependency_list,
                                              branch,
                                              xml_doc)
-            if PomParser.BUILD_CONST in xml_doc[PomParser.PROJECT_CONST]:
-                if PomParser.PLUGINS_CONST in xml_doc[PomParser.PROJECT_CONST][PomParser.BUILD_CONST]:
-                    plugin_list = xml_doc[PomParser.PROJECT_CONST][PomParser.BUILD_CONST][PomParser.PLUGINS_CONST][PomParser.PLUGIN_CONST]
-                    self.process_dependency_list_for(client_repo[PomParser.NAME_CONST],
+            if Constants.BUILD_CONST in xml_doc[Constants.PROJECT_CONST]:
+                if Constants.PLUGINS_CONST in xml_doc[Constants.PROJECT_CONST][Constants.BUILD_CONST]:
+                    plugin_list = xml_doc[Constants.PROJECT_CONST][Constants.BUILD_CONST][Constants.PLUGINS_CONST][
+                        Constants.PLUGIN_CONST]
+                    self.process_dependency_list_for(client_repo[Constants.NAME_CONST],
                                                      plugin_list,
                                                      branch,
                                                      xml_doc)
             # also check the 'parent' structure
-            if PomParser.PARENT_CONST in xml_doc[PomParser.PROJECT_CONST]:
-                parent_list = xml_doc[PomParser.PROJECT_CONST][PomParser.PARENT_CONST]
-                self.process_dependency_list_for(client_repo[PomParser.NAME_CONST],
+            if Constants.PARENT_CONST in xml_doc[Constants.PROJECT_CONST]:
+                parent_list = xml_doc[Constants.PROJECT_CONST][Constants.PARENT_CONST]
+                self.process_dependency_list_for(client_repo[Constants.NAME_CONST],
                                                  parent_list,
                                                  branch,
                                                  xml_doc)
             # and the 'dependencyManagement' structure
-            if PomParser.DEPENDENCY_MANAGEMENT_CONST in xml_doc[PomParser.PROJECT_CONST]:
-                if PomParser.DEPENDENCIES_CONST in xml_doc[PomParser.PROJECT_CONST][PomParser.DEPENDENCY_MANAGEMENT_CONST]:
-                    dependency_management_list = xml_doc[PomParser.PROJECT_CONST][PomParser.DEPENDENCY_MANAGEMENT_CONST][PomParser.DEPENDENCIES_CONST][PomParser.DEPENDENCY_CONST]
-                    self.process_dependency_list_for(client_repo[PomParser.NAME_CONST],
+            if Constants.DEPENDENCY_MANAGEMENT_CONST in xml_doc[Constants.PROJECT_CONST]:
+                if Constants.DEPENDENCIES_CONST in xml_doc[Constants.PROJECT_CONST][
+                    Constants.DEPENDENCY_MANAGEMENT_CONST]:
+                    dependency_management_list = \
+                    xml_doc[Constants.PROJECT_CONST][Constants.DEPENDENCY_MANAGEMENT_CONST][
+                        Constants.DEPENDENCIES_CONST][Constants.DEPENDENCY_CONST]
+                    self.process_dependency_list_for(client_repo[Constants.NAME_CONST],
                                                      dependency_management_list,
                                                      branch,
                                                      xml_doc)
         else:
             # no XML pom file - remove the repo (NO)?
             client_repo.update({branch + '_pom_exists': False})
-            print('Ignoring ' + client_repo[PomParser.NAME_CONST]
+            print('Ignoring ' + client_repo[Constants.NAME_CONST]
                   + ' for branch '
                   + branch
                   + ' as either '
@@ -96,18 +88,18 @@ class PomParser:
             client_list = []
             if 'artifactId' in dependency:
                 artifact_name = dependency['artifactId']
-                if PomParser.VERSION_CONST in dependency:
+                if Constants.VERSION_CONST in dependency:
                     # it's the one that we want, return it
-                    updated_version = dependency[PomParser.VERSION_CONST]
+                    updated_version = dependency[Constants.VERSION_CONST]
                     if updated_version.startswith('$'):
                         # it's a variable - so get the value from the properties section of the pom
                         updated_version = updated_version.replace('${', '').replace('}', '')
                         try:
-                            updated_version = xml_doc[PomParser.PROJECT_CONST]['properties'][updated_version]
+                            updated_version = xml_doc[Constants.PROJECT_CONST]['properties'][updated_version]
                         except KeyError:
                             # do nothing
                             print(f'Error trying to find {updated_version} in pom.xml for project {client_name}')
-                    client_detail = {PomParser.CLIENT_CONST: client_name, PomParser.VERSION_CONST: updated_version}
+                    client_detail = {Constants.CLIENT_CONST: client_name, Constants.VERSION_CONST: updated_version}
                     client_list.append(client_detail)
                     # update library detail with client list
 
@@ -115,8 +107,8 @@ class PomParser:
                     check_library_detail = get_library_from_list(artifact_name)
                     if check_library_detail is None:
                         # then it needs to be added
-                        library_detail = {PomParser.NAME_CONST: artifact_name,
-                                          PomParser.HIGHEST_CONST: updated_version,
+                        library_detail = {Constants.NAME_CONST: artifact_name,
+                                          Constants.HIGHEST_CONST: updated_version,
                                           client_list_name: client_list}
                         PomParser.library_details.append(library_detail)
                     else:
@@ -128,15 +120,15 @@ class PomParser:
                             updated_client_list = []
                         updated_client_list.append(client_detail)
                         highest_version = self.return_highest(updated_version, artifact_name)
-                        check_library_detail.update({PomParser.NAME_CONST: artifact_name,
-                                                     PomParser.HIGHEST_CONST: highest_version,
+                        check_library_detail.update({Constants.NAME_CONST: artifact_name,
+                                                     Constants.HIGHEST_CONST: highest_version,
                                                      client_list_name: updated_client_list})
 
     def return_highest(self, first, library_name):
         for library in PomParser.library_details:
-            if library[PomParser.NAME_CONST] == library_name:
+            if library[Constants.NAME_CONST] == library_name:
                 # check if it is a list or string ...
-                this_version = self.return_highest_version(library[PomParser.HIGHEST_CONST])
+                this_version = self.return_highest_version(library[Constants.HIGHEST_CONST])
                 updated_version = self.return_highest_version(first)
                 this_array = [updated_version, this_version]
                 try:
@@ -202,7 +194,7 @@ class PomParser:
 #
 def get_library_from_list(artifact_name):
     for artifact in PomParser.library_details:
-        if artifact[PomParser.NAME_CONST] == artifact_name:
+        if artifact[Constants.NAME_CONST] == artifact_name:
             # it's a match ... return the version
             return artifact
 
@@ -214,7 +206,7 @@ def get_library_from_list(artifact_name):
 #
 def find_highest_version(artifact_name):
     for artifact in PomParser.library_details:
-        if artifact[PomParser.NAME_CONST] == artifact_name:
+        if artifact[Constants.NAME_CONST] == artifact_name:
             # it's a match ... return the version
             return artifact
 

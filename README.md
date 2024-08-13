@@ -1,6 +1,6 @@
 # Maven cross-reference utils
-## check-maven-pom-xref-file-system.py
-## check-maven-pom-xref-github.py
+## pom-xref-file-system.py
+## pom-xref-github.py
 
 A simple python utility (Disclaimer: I'm a Java with maven developer not a Python developer) to read 
 * GitHub repos for all MAVEN projects with a given prefix 
@@ -12,6 +12,9 @@ OR
     - an html xref of all selected repos to show which version of which library is used in which project
 
 # to run
+NOTE that the entry point to run these utilities are python scripts, which then reference modules within a package, so 
+to run the utilities correctly, please change to the correct directory ('maven-pom-xref-util/src') first so that python can then resolve the 
+package modules correctly.
 
 ## option 1 - GitHub
 ### dependencies
@@ -31,13 +34,17 @@ The script expects to be supplied with a git username and a git PAT 'personal ac
 See Github https://github.com/settings/tokens
 
 ### command line parameters
-e.g.:
+if not already positioned in the 'maven-pom-xref-util/src' , change directory now i.e. on linux, inside the maven-pom-xref-util downloaded directory
+```commandline
+cd src
 ```
-python3 src/check-maven-pom-xref-github.py -u=<git username> -t=<github PAT> -p=<repo prefix to select, empty for all> -b=<comma separated list of branches to include> -ia=<ignore archived projects Y|N> -ip=<ignore private projects Y|N>  -i=<comma-separated list of repositories to IGNORE - no spaces between the repo names, just a comma>
+then, execute the relevant python module (using -m) and specifying the relevant parameters:
 ```
-for more parameter information:
+python3 -m pom_xref_util.pom-xref-github -u=<git username> -t=<github PAT> -p=<repo prefix to select, empty for all> -b=<comma separated list of branches to include> -ia=<ignore archived projects Y|N> -ip=<ignore private projects Y|N>  -i=<comma-separated list of repositories to IGNORE - no spaces between the repo names, just a comma>
 ```
-python3 src/check-maven-pom-xref-github.py --help
+for more parameter information (also inside the src directory):
+```
+python3 -m pom_xref_util.pom-xref-github --help
 ```
 
 ## option 2 - File System
@@ -46,8 +53,8 @@ python3 src/check-maven-pom-xref-github.py --help
 import argparse
 import datetime
 import os
-from io import StringIO
 import xmltodict
+from io import StringIO
 ```
 ### Requirements
 The script expects to be supplied with a local directory name containing all relevant repositories to be queried.
@@ -64,14 +71,20 @@ source-directory
 ```
 
 ### command line parameters
-e.g.:
+if not already positioned in the 'maven-pom-xref-util/src' , change directory now i.e. on linux, inside the maven-pom-xref-util downloaded directory
+```commandline
+cd src
 ```
-python3 src/check-maven-pom-xref-file-system.py -d=/home/maven-projects/source-directory -p=<repo prefix to select, empty for all> -i=<comma-separated list of repositories to IGNORE - no spaces between the repo names, just a comma>
+python3 -m pom_xref_util.pom-xref-file-system.py -d=/home/maven-projects/source-directory -p=<repo prefix to select, empty for all> -i=<comma-separated list of repositories to IGNORE - no spaces between the repo names, just a comma>
 ```
 for more parameter information:
 ```
-python3 src/check-maven-pom-xref-file-system.py --help
+python3 -m pom_xref_util.pom-xref-file-system.py --help
 ```
 
+To build a distribution, see
+```commandline
+https://packaging.python.org/en/latest/tutorials/packaging-projects/
+```
 ## Example HTML output
 ![Image](example-html-report.png)
