@@ -125,7 +125,8 @@ def start():
                                          pom_parser,
                                          output_file_name,
                                          False,
-                                         git_branches)
+                                         git_branches,
+                                         Constants.DEFAULT_POM_FILE_NAME)
 
 
 #

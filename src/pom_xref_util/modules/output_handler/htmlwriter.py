@@ -18,7 +18,8 @@ def write_html_format_results(library_details,
                               pom_parser,
                               output_file_name,
                               file_system_source,
-                              git_branches):
+                              git_branches,
+                              pom_file_name):
     global output_file
     if not os.path.exists(os.path.dirname(output_file_name)):
         os.makedirs(os.path.dirname(output_file_name))
@@ -32,7 +33,7 @@ def write_html_format_results(library_details,
     _print_to_output_file('<tr>')
     _print_to_output_file('<td>Key:</td>')
     _print_to_output_file(
-        f'<td style = {Constants.NO_POM_COLOUR}>pom.xml or project not found in the specified branch. '
+        f'<td style = {Constants.NO_POM_COLOUR}>{pom_file_name} or project not found in the specified branch. '
         f'If not present in all branches, consider ignoring the project with the -i= runtime parameter.</td>')
     _print_to_output_file('</tr>')
     _print_to_output_file('<tr>')

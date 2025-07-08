@@ -18,7 +18,9 @@ repository_list = []
 #
 # from parameters
 arg_source_directory = None
+pom_file_name = Constants.DEFAULT_POM_FILE_NAME
 arg_repo_prefix = None
+env_java_home = None
 ignore_repos = []
 # we assume the script is run from the src directory, so 'one up' is to the root
 output_file_name = os.path.join('..', 'results',
@@ -29,11 +31,12 @@ pom_parser = PomParser()
 
 
 def parse_command_line_arguments():
-    global arg_source_directory, arg_repo_prefix, ignore_repos
+    global arg_source_directory, arg_repo_prefix, pom_file_name, env_java_home, ignore_repos
     # create parser
     parser = argparse.ArgumentParser()
     # add arguments to the parser
     parser.add_argument('--source_directory', '-d', help='directory containing maven projects')
+    parser.add_argument('--overridden_pom_name', '-o', help='use overridden pom name, e.g.: effective-pom.xml')
     parser.add_argument('--repo_prefix', '-p',
                         help='process all/any repositories with this prefix, e.g. company-name-')
     parser.add_argument('--repo_list_to_ignore', '-i',
@@ -42,9 +45,12 @@ def parse_command_line_arguments():
     # parse the arguments
     args = parser.parse_args()
 
+
     # get the arguments value
     if args.source_directory is not None:
         arg_source_directory = args.source_directory
+    if args.overridden_pom_name is not None:
+        pom_file_name = args.overridden_pom_name
     if args.repo_prefix is not None:
         arg_repo_prefix = args.repo_prefix
     if args.repo_list_to_ignore is not None:
@@ -66,13 +72,13 @@ def start():
     global repository_list
     for root, dirs, files in os.walk(arg_source_directory):
         for file in files:
-            if file == 'pom.xml':
+            if file == pom_file_name:
                 split_root = os.path.split(root)
                 if split_root is not None and split_root[0] == arg_source_directory:
                     # source_directory == split_root if we're just 1 level down from root ....
                     repository_list.append({Constants.NAME_CONST: split_root[1],
                                             'owner': 'owner',
-                                            'url': os.path.join(root, 'pom.xml')})
+                                            'url': os.path.join(root, file)})
 
     process_repositories_for_branch()
     htmlwriter.write_html_format_results(library_details,
@@ -80,7 +86,8 @@ def start():
                                          pom_parser,
                                          output_file_name,
                                          True,
-                                         [])
+                                         [],
+                                         pom_file_name)
 
 
 def we_do_process_this_repo(repo_name):
@@ -116,13 +123,19 @@ def process_repositories_for_branch():
 def handle_xml_content(pom_url):
     xml_doc = None
     # retrieve the pom.xml from file system
-    with open(pom_url) as fd:
-        try:
-            xml_doc = xmltodict.parse(fd.read())
-        except Exception:
-            print(f'exception - xmltodict problem with {pom_url}')
+    xml_doc = parse_xml_document(pom_url)
 
     return xml_doc
+
+
+def parse_xml_document(document_path):
+    with open(document_path) as fd:
+        try:
+            return xmltodict.parse(fd.read())
+        except Exception as pe:
+            print(f'exception - xmltodict problem with {document_path}', pe)
+
+    return None
 
 
 # MAIN

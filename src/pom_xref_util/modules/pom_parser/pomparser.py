@@ -21,37 +21,13 @@ class PomParser:
             # look for each of the lib libraries being used here ....
             # if xml_doc['project']['artifactId']} ...
             client_repo.update({branch + '_pom_exists': True})
-            dependency_list = xml_doc[Constants.PROJECT_CONST][Constants.DEPENDENCIES_CONST][Constants.DEPENDENCY_CONST]
-            self.process_dependency_list_for(client_repo[Constants.NAME_CONST],
-                                             dependency_list,
-                                             branch,
-                                             xml_doc)
-            if Constants.BUILD_CONST in xml_doc[Constants.PROJECT_CONST]:
-                if Constants.PLUGINS_CONST in xml_doc[Constants.PROJECT_CONST][Constants.BUILD_CONST]:
-                    plugin_list = xml_doc[Constants.PROJECT_CONST][Constants.BUILD_CONST][Constants.PLUGINS_CONST][
-                        Constants.PLUGIN_CONST]
-                    self.process_dependency_list_for(client_repo[Constants.NAME_CONST],
-                                                     plugin_list,
-                                                     branch,
-                                                     xml_doc)
-            # also check the 'parent' structure
-            if Constants.PARENT_CONST in xml_doc[Constants.PROJECT_CONST]:
-                parent_list = xml_doc[Constants.PROJECT_CONST][Constants.PARENT_CONST]
-                self.process_dependency_list_for(client_repo[Constants.NAME_CONST],
-                                                 parent_list,
-                                                 branch,
-                                                 xml_doc)
-            # and the 'dependencyManagement' structure
-            if Constants.DEPENDENCY_MANAGEMENT_CONST in xml_doc[Constants.PROJECT_CONST]:
-                if Constants.DEPENDENCIES_CONST in xml_doc[Constants.PROJECT_CONST][
-                    Constants.DEPENDENCY_MANAGEMENT_CONST]:
-                    dependency_management_list = \
-                    xml_doc[Constants.PROJECT_CONST][Constants.DEPENDENCY_MANAGEMENT_CONST][
-                        Constants.DEPENDENCIES_CONST][Constants.DEPENDENCY_CONST]
-                    self.process_dependency_list_for(client_repo[Constants.NAME_CONST],
-                                                     dependency_management_list,
-                                                     branch,
-                                                     xml_doc)
+            # First, check 'dependencyManagement' structure, found in parent/effective poms
+            if Constants.PROJECTS_CONST in xml_doc:
+                # multiple projects, presumably an effective pom
+                for project in xml_doc[Constants.PROJECTS_CONST][Constants.PROJECT_CONST]:
+                    self.process_one_project(branch, client_repo, project)
+            else:
+                self.process_one_project(branch, client_repo, xml_doc[Constants.PROJECT_CONST])
         else:
             # no XML pom file - remove the repo (NO)?
             client_repo.update({branch + '_pom_exists': False})
@@ -70,6 +46,44 @@ class PomParser:
     @staticmethod
     def get_library_details():
         return PomParser.library_details
+
+    def process_one_project(self, branch, client_repo, xml_doc):
+        # if there is no dependencyManagement block, we are probably processing a child pom
+        try:
+            dependency_list = xml_doc[Constants.DEPENDENCIES_CONST][
+                Constants.DEPENDENCY_CONST]
+        except KeyError:
+            # No dependencies
+            return
+
+        self.process_dependency_list_for(client_repo[Constants.NAME_CONST],
+                                         dependency_list,
+                                         branch,
+                                         xml_doc)
+        if Constants.BUILD_CONST in xml_doc:
+            if Constants.PLUGINS_CONST in xml_doc[Constants.BUILD_CONST]:
+                plugin_list = xml_doc[Constants.BUILD_CONST][Constants.PLUGINS_CONST][
+                    Constants.PLUGIN_CONST]
+                self.process_dependency_list_for(client_repo[Constants.NAME_CONST],
+                                                 plugin_list,
+                                                 branch,
+                                                 xml_doc)
+        # also check the 'parent' structure
+        if Constants.PARENT_CONST in xml_doc:
+            parent_list = xml_doc[Constants.PARENT_CONST]
+            self.process_dependency_list_for(client_repo[Constants.NAME_CONST],
+                                             parent_list,
+                                             branch,
+                                             xml_doc)
+        if Constants.DEPENDENCY_MANAGEMENT_CONST in xml_doc:
+            if Constants.DEPENDENCIES_CONST in xml_doc[Constants.DEPENDENCY_MANAGEMENT_CONST]:
+                dependency_management_list = \
+                    xml_doc[Constants.DEPENDENCY_MANAGEMENT_CONST][
+                        Constants.DEPENDENCIES_CONST][Constants.DEPENDENCY_CONST]
+                self.process_dependency_list_for(client_repo[Constants.NAME_CONST],
+                                                 dependency_management_list,
+                                                 branch,
+                                                 xml_doc)
 
     #
     # iterate through the dependencies listed in the pom

@@ -7,6 +7,8 @@ A simple python utility (Disclaimer: I'm a Java with maven developer not a Pytho
 OR
 * A nominated local directory containing maven based projects and 
   - get the relevant pom.xml for repo/branch
+    - OR using the -o run time parameter, define an alternative pom file name if it exists, e.g.  -o=effective-pom.xml 
+    - P.S. ... see scripts/generate-effective-pom.sh for an example
   - cross-reference all library dependencies ...
   - produce in the 'results' sub-directory (which you may have to create)
     - an html xref of all selected repos to show which version of which library is used in which project
@@ -75,7 +77,7 @@ if not already positioned in the 'maven-pom-xref-util/src' , change directory no
 ```commandline
 cd src
 ```
-python3 -m pom_xref_util.pom-xref-file-system.py -d=/home/maven-projects/source-directory -p=<repo prefix to select, empty for all> -i=<comma-separated list of repositories to IGNORE - no spaces between the repo names, just a comma>
+python3 -m pom_xref_util.pom-xref-file-system -d=/home/maven-projects/source-directory -p=<repo prefix to select, empty for all> -i=<comma-separated list of repositories to IGNORE - no spaces between the repo names, just a comma>
 ```
 for more parameter information:
 ```
